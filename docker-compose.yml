@@ -1,0 +1,86 @@
+version: '3.8'
+
+services:
+  # 1. Primary Relational Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: drishti-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-drishti_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-drishti_secret}
+      POSTGRES_DB: ${POSTGRES_DB:-drishti_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./database/seeds/synthetic_seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-drishti_user} -d ${POSTGRES_DB:-drishti_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - drishti-network
+
+  # 2. FastAPI Backend Service (API v1)
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: drishti-backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-drishti_user}:${POSTGRES_PASSWORD:-drishti_secret}@postgres:5432/${POSTGRES_DB:-drishti_db}
+      SECRET_KEY: ${SECRET_KEY:-drishti_jwt_secret_sih2026}
+      API_V1_STR: /api/v1
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
+    networks:
+      - drishti-network
+
+  # 3. AI Anomaly Engine Worker
+  ai-engine:
+    build:
+      context: ./ai
+      dockerfile: Dockerfile
+    container_name: drishti-ai-worker
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_started
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-drishti_user}:${POSTGRES_PASSWORD:-drishti_secret}@postgres:5432/${POSTGRES_DB:-drishti_db}
+      AI_ANOMALY_THRESHOLD: 0.65
+    volumes:
+      - ./ai:/app
+    networks:
+      - drishti-network
+
+  # 4. Central React Dashboard
+  dashboard:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: drishti-dashboard
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api/v1
+    networks:
+      - drishti-network
+
+networks:
+  drishti-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+    driver: local

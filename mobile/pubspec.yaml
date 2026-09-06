@@ -1,0 +1,47 @@
+name: drishti_inspector
+description: "DRISHTI Field Inspector Mobile App - Ministry of Social Justice and Empowerment (MoSJE)"
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Networking & HTTP
+  http: ^1.2.0
+
+  # Local Offline SQLite Storage
+  sqflite: ^2.3.2
+  path_provider: ^2.1.2
+  path: ^1.9.0
+
+  # Cryptography & Tamper-Resistant SHA-256 Hashing
+  crypto: ^3.0.3
+
+  # Geolocation & GPS Hardware
+  geolocator: ^11.0.0
+
+  # Device & Media
+  image_picker: ^1.0.7
+
+  # State & Utilities
+  provider: ^6.1.1
+  intl: ^0.19.0
+  uuid: ^4.3.3
+  shared_preferences: ^2.2.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+  mockito: ^5.4.4
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/

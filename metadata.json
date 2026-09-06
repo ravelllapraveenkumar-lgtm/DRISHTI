@@ -1,0 +1,6 @@
+{
+  "name": "DRISHTI - Smart Monitoring & Inspection",
+  "description": "Prototype real-time monitoring and inspection platform for institutions and projects under government schemes (MoSJE / SIH 2026 Problem ID 26095).",
+  "requestFramePermissions": ["camera", "geolocation"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
