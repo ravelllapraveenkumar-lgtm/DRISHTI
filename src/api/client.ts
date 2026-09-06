@@ -28,7 +28,7 @@ import {
   Beneficiary
 } from '../types/api';
 
-const API_BASE_URL = '/api/v1';
+const API_BASE_URL = ((import.meta.env && import.meta.env.VITE_API_BASE_URL) || '/api/v1').replace(/\/$/, '');
 
 export interface ApiResponse<T> {
   data: T;
@@ -135,7 +135,10 @@ class DrishtiApiClient {
   // Health checks
   public async checkHealth(): Promise<{ status: string; isLive: boolean }> {
     try {
-      const res = await fetch('/health');
+      const healthUrl = API_BASE_URL.startsWith('http')
+        ? `${API_BASE_URL.replace(/\/api\/v1$/, '')}/health`
+        : '/health';
+      const res = await fetch(healthUrl);
       if (res.ok) {
         const data = await res.json();
         this.isLiveBackend = true;
