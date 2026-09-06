@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: drishti-backend
+    runtime: docker
+    dockerfilePath: backend/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: "false"
+      - key: LOG_LEVEL
+        value: INFO
+      - key: API_V1_STR
+        value: /api/v1
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: AI_ANOMALY_THRESHOLD
+        value: "0.65"
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
