@@ -123,4 +123,8 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("backend.app.main:app", host="0.0.0.0", port=8000, reload=True)
+    import os
+    port = int(os.getenv("PORT", os.getenv("BACKEND_PORT", "8000")))
+    host = os.getenv("HOST", os.getenv("BACKEND_HOST", "0.0.0.0"))
+    uvicorn.run("backend.app.main:app", host=host, port=port, reload=True)
+
